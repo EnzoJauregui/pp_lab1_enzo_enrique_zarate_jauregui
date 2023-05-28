@@ -12,21 +12,51 @@ def leer_archivo(ruta: str) -> list:
 
     return contenido['jugadores']
 lista_jugadores = leer_archivo('C:\\Users\\enzo9\\OneDrive\\Documentos\\Programacion 1\\def\\dt.json')
-#EJERCICIO 1
-def mostrar_jugadores_nombre_posicion(lista_jugadores: list) -> str:
+
+def join_lista(lista: list, flag_join: bool) -> str:
+    '''
+    Recibe una lista de strings y una variable booleana. 
+    Si la lista tiene mas de 1 elemento, los separa por saltos de linea o ',' dependiendo de la variable booleana.
+    Si la lista tiene un elemento, lo devuelve en string.
+    Si la lista esta vacia, muestra un mensaje.
+    Retorna una cadena de strings.
+    '''
+    if len(lista) > 1:
+        if flag_join:
+            cadena = '\n'.join(lista)
+        else:
+            cadena = ','.join(lista)
+    elif len(lista) == 1:
+        cadena = str(lista)
+    else:
+        print('LISTA VACIA')
+        return -1
+    return cadena
+
+#EJERCICIO 1 Y PARTE DEL EJERCICIO 5
+def mostrar_jugadores_nombre_posicion(lista_jugadores: list, flag_jugador: bool) -> str:
     '''
     Recibe como parametros una lista de diccionarios que contiene la informacion de cada uno de los jugadores
     Muestra el nombre y la posicion de todos los jugadores.
     Retorna un string.
     '''
-    mensaje = ''
+    lista_mensajes = []
     for jugador in lista_jugadores:
-        mensaje += '{0} - {1}\n'.format(jugador['nombre'], jugador['posicion'])
-    return mensaje
+        if flag_jugador:
+            lista_mensajes.append('{0} - {1}'.format(jugador['nombre'], jugador['posicion']))
+        else:
+            for clave, valor in jugador['estadisticas'].items():
+                        if clave == 'promedio_puntos_por_partido':
+                            lista_mensajes.append('{0}: {1} - {2}: {3}'.format('nombre'.upper(), jugador['nombre'], normalizar_dato(clave), valor))
+    return join_lista(lista_mensajes, True)
 
-def join_lista(lista: list) -> str:
-    cadena = ','.join(lista)
-    return cadena
+def normalizar_dato(dato: str) -> str:
+    '''
+    Recibe una variable string como parametro y lo normaliza.
+    retorna el dato normalizado.    
+    '''
+    dato_normalizado = dato.capitalize().replace('_', " ")
+    return dato_normalizado
 
 #EJERCICIO 2
 def mostrar_estadisticas(lista_jugadores: list, indice_input: int) -> str:
@@ -35,22 +65,17 @@ def mostrar_estadisticas(lista_jugadores: list, indice_input: int) -> str:
     Muestra el nombre, la posicion y las estadisticas del usuario ingresado por input.
     Retorna un string
     '''
-    mensaje = ''
+    lista_mensajes = []
     lista_valores = []
-    for indice in range(len(lista_jugadores)):
-        if indice_input == indice + 1:
-            estadisticas = lista_jugadores[indice]['estadisticas']
-            nombre = '----------{0}---------\n\n\n\nESTADISTICAS:\n'.format(lista_jugadores[indice]['nombre'])
-
-            for clave, valor in estadisticas.items():
-                mensaje += '{1}: {2} \n'.format(nombre, clave.capitalize().replace('_', " "), valor)
-                lista_valores.append(str(valor))
-    
-    print(nombre + mensaje)
-
     jugador = lista_jugadores[indice_input-1]
 
-    contenido = '{0}, {1}, {2}, {3}'.format(jugador['nombre'], jugador['posicion'], join_lista(lista_valores))
+    for clave, valor in jugador['estadisticas'].items():
+        lista_mensajes.append('{0}: {1}'.format(normalizar_dato(clave), valor))
+        lista_valores.append(str(valor))
+    
+    print('\n----------{0}---------\n\nESTADISTICAS:\n{1}'.format(jugador['nombre'], join_lista(lista_mensajes, True)))
+
+    contenido = '{0},{1},{2}'.format(jugador['nombre'], jugador['posicion'], join_lista(lista_valores, False))
     return contenido
 
 #EJERCICIO 3
@@ -86,7 +111,7 @@ def mostrar_si_pertenece_salon_fama(lista: list, flag_nombre: bool) -> None:
     :type flag_nombre: bool
     """
     cadena = 'Miembro del Salon de la Fama del Baloncesto'
-    mensaje = ''
+
     for jugador in lista:
         if flag_nombre:
             if cadena in jugador['logros']:
@@ -94,9 +119,7 @@ def mostrar_si_pertenece_salon_fama(lista: list, flag_nombre: bool) -> None:
             else:
                 print('-{0} no es {1}'.format(jugador['nombre'], cadena))
         else:
-            for logro in jugador['logros']:
-                mensaje += logro + '\n'
-            print('----------{0}---------\n\nLOGROS:\n{1}'.format(jugador['nombre'], mensaje))
+            print('----------{0}---------\n\nLOGROS:\n{1}'.format(jugador['nombre'], join_lista(jugador['logros'], True)))
 
 def dividir(numerador: float, divisor: int) -> float:
     '''
@@ -137,16 +160,39 @@ def calcular_promedio_puntos_por_partido(lista: list, dato: str) -> float:
     retorno_redondeado = round(retorno, 2)
     return retorno_redondeado
 
+#PARTE DE LOS EJERCICIOS 5 Y 16
+def cadena_promedio_total(dato, promedio, flag_promedio) -> str:
+    """
+    Esta función devuelve un mensaje de cadena que incluye el promedio de datos dados para todo el Dream
+    Team o el promedio excluyendo al jugador con los puntos más bajos.
+    
+    :param dato: una cadena que representa el tipo de datos que se procesan (por ejemplo, "promedio de
+    puntos")
+    :param promedio: El valor promedio de un cierto punto de datos (por ejemplo, puntos anotados,
+    rebotes, asistencias) para un equipo o subconjunto del equipo
+    :param flag_promedio: Una bandera booleana que indica si el valor promedio es el promedio de todo el
+    Dream Team o el promedio excluyendo al jugador con los puntos más bajos
+    :return: un mensaje de cadena que incluye el promedio de un dato dado para todo el Dream Team o el
+    promedio excluyendo al jugador con los puntos más bajos, según el valor del parámetro flag_promedio.
+    El mensaje también incluye los datos normalizados (mediante la función normalizar_dato) y el valor
+    correspondiente de la media.
+    """
+    if flag_promedio:
+        mensaje = '\n{0} de todo el equipo del Dream Team es: {1}\n'.format(normalizar_dato(dato), promedio)
+    else:
+        mensaje = 'El {0} del equipo excluyendo al jugador que menos puntos tiene: {1}'.format(normalizar_dato(dato), promedio)
+
+    return mensaje
+
 #PARTE DE LOS EJERCICIOS 5 Y 20
 def ordenar_palabras(lista_jugadores: list, key_string: str, flag: bool) -> list:
     """
     Esta función ordena una lista de diccionarios por una cadena de clave específica en orden ascendente
     o descendente.
     
-    :param lista_jugadores: Una lista de diccionarios que representan a los jugadores y sus atributos
+    :param lista_jugadores: Una lista de diccionarios que representan a los jugadores y sus datos
     :type lista_jugadores: list
-    :param key_string: El parámetro key_string es una cadena que representa la clave o atributo del
-    diccionario en la lista de reproductores que se usarán para ordenar la lista
+    :param key_string: El parámetro key_string es una cadena que representa la clave cuyo valor es un string
     :type key_string: str
     :param flag: El parámetro flag es un valor booleano que determina el orden de clasificación. Si flag
     es True, la función ordenará la lista en orden ascendente. Si la bandera es Falsa, la función
@@ -203,7 +249,7 @@ def mostrar_jugador_estadistica_dato(lista: list, dato: str) -> None:
     print('\nCoincidencias encontradas: {0}\n'.format(len(lista)))
 
     for jugador in lista:
-            print('Nombre: {0} - {1}: {2}'.format(jugador['nombre'], dato.capitalize().replace('_', " "), jugador['estadisticas'][dato]))
+            print('Nombre: {0} - {1}: {2}'.format(jugador['nombre'], normalizar_dato(dato), jugador['estadisticas'][dato]))
 
 #EJERCICION 10, 11, 12, 15, 18 Y PARTE DEL 20
 def mayor_cantidad_dato(lista_jugadores: list, dato: str, numero: int) -> str:
@@ -225,24 +271,22 @@ def mayor_cantidad_dato(lista_jugadores: list, dato: str, numero: int) -> str:
     valor mayor que el número dado para el tipo de datos dado.
     """
     
-    cadena_jugadores = ''
+    lista_cadenas = []
     flag_ingreso = False
+
     for jugador in lista_jugadores:
         for clave, valor in jugador['estadisticas'].items():
             if clave == dato:
                 if valor > numero:
                     flag_ingreso = True
+
                     if dato == 'porcentaje_tiros_de_campo':
-                        cadena_jugadores += 'NOMBRE: {0} POSICION: {1} - {2}: {3}\n'.format(jugador['nombre'],
-                                                                                            jugador['posicion'],
-                                                                                            dato.capitalize().replace('_', " "),
-                                                                                             valor)
+                        lista_cadenas.append('NOMBRE: {0} - POSICION: {1} - {2}: {3}'.format(jugador['nombre'], jugador['posicion'], normalizar_dato(dato), valor))
                     else:
-                        cadena_jugadores += 'NOMBRE: {0} - {1}: {2}\n'.format(jugador['nombre'],
-                                                                              dato.capitalize().replace('_', " "),
-                                                                              valor)
+                        lista_cadenas.append('NOMBRE: {0} - {1}: {2}'.format(jugador['nombre'], normalizar_dato(dato), valor))
+
     if flag_ingreso: 
-        return cadena_jugadores
+        return join_lista(lista_cadenas, True)
     else:
         return 'Ninguno supera este valor'
 
@@ -283,18 +327,15 @@ def jugador_con_mas_logros(lista_jugadores: list) -> list:
     :return: una cadena que incluye el nombre del jugador con más logros y una lista de sus logros.
     """
     rango = len(lista_jugadores)
+
     for indice in range(rango):
         if indice == 0 or len(lista_jugadores[indice]['logros']) > max_logros:
             max_logros = len(lista_jugadores[indice]['logros'])
             indice_max = indice
-    cadena = ''
-    for i in range(rango):
-        if i == indice_max:
-            nombre = '----------{0}---------\n\nLOGROS:\n'.format(lista_jugadores[indice_max]['nombre'])
-            for logro in lista_jugadores[indice_max]['logros']:
-                cadena += logro + '\n'
+    
+    cadena = '\n----------{0}---------\n\nLOGROS:\n{1}'.format(lista_jugadores[indice_max]['nombre'], join_lista(lista_jugadores[indice_max]['logros'], True))
+    return cadena
 
-    return nombre + cadena
 
 def imprimir_menu() -> None:
     '''
@@ -390,17 +431,17 @@ def main_dream_team(lista_jugadores: list) -> None:
     Llama a la funcion imprimir_menu y permite acceder a las funciones dependiendo de la opcion ingresada
     Return none
     '''
-    imprimir_menu()
     flag_main = True
     flag_guardar = False
     while flag_main:
+        imprimir_menu()
         opcion = validar_numero(input('Ingrese numero de opcion (0 al 20): '))
         match opcion:
             case 0:
                 flag_main = False
             case 1:
                 print('')
-                print(mostrar_jugadores_nombre_posicion(lista_jugadores))
+                print(mostrar_jugadores_nombre_posicion(lista_jugadores, True))
                 input('PULSE ENTER PARA CONTINUAR')
             case 2:
                 indice_input = validar_indice()
@@ -418,13 +459,9 @@ def main_dream_team(lista_jugadores: list) -> None:
                 mostrar_si_pertenece_salon_fama(validar_nombre(lista_jugadores), False)
                 input('PULSE ENTER PARA CONTINUAR')
             case 5:
-                key_string = 'nombre'
                 dato = 'promedio_puntos_por_partido'
-                print('El {0} de todo el equipo del Dream Team es: {1}\n'.format(dato.replace('_', " "), calcular_promedio_puntos_por_partido(lista_jugadores, dato)))
-                for jugador in  ordenar_palabras(lista_jugadores, key_string, True):
-                    for clave, valor in jugador['estadisticas'].items():
-                        if clave == dato:
-                            print('{0}: {1} - {2}: {3}'.format(key_string.upper(), jugador[key_string], clave.capitalize().replace('_', " "), valor))
+                print(cadena_promedio_total(dato, calcular_promedio_puntos_por_partido(lista_jugadores, dato), True))
+                print(mostrar_jugadores_nombre_posicion(ordenar_palabras(lista_jugadores, 'nombre', False), False))
                 input('PULSE ENTER PARA CONTINUAR')
             case 6:
                 mostrar_si_pertenece_salon_fama(validar_nombre(lista_jugadores), True)
@@ -463,7 +500,7 @@ def main_dream_team(lista_jugadores: list) -> None:
             case 16:
                 dato = 'promedio_puntos_por_partido'
                 promedio = calcular_promedio_puntos_por_partido(ordenar_estadistica_dato_descendente(lista_jugadores, dato)[:-1], dato)
-                print('El {0} del equipo excluyendo al jugador que menos puntos tiene: {1}'.format(dato.replace('_', " "), promedio))
+                print(cadena_promedio_total(dato, promedio, False))
                 input('PULSE ENTER PARA CONTINUAR')
             case 17:
                 print(jugador_con_mas_logros(lista_jugadores))
