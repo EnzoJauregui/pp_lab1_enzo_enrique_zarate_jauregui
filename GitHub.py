@@ -11,7 +11,6 @@ def leer_archivo(ruta: str) -> list:
         contenido = json.load(archivo)
 
     return contenido['jugadores']
-lista_jugadores = leer_archivo('C:\\Users\\enzo9\\OneDrive\\Documentos\\Programacion 1\\def\\dt.json')
 
 def join_lista(lista: list, flag_join: bool) -> str:
     '''
@@ -90,8 +89,10 @@ def guardar_csv(ruta: str,  contenido: str) -> bool:
     with open(ruta, 'w+') as archivo:
         byte = archivo.write(contenido)
     if byte > 0:
+        print('Archivo CSV creado')
         flag_creado = True
     else:
+        print('ERROR archivo csv no creado')
         flag_creado = False
     return flag_creado
 
@@ -206,14 +207,14 @@ def ordenar_palabras(lista_jugadores: list, key_string: str, flag: bool) -> list
         flag_swap = False
         rango -= 1
         for i in range(rango):
-            if flag == False and lista_jugadores[i][key_string][0] > lista_jugadores[i+1][key_string][0] or\
-                flag == True and lista_jugadores[i][key_string][0] < lista_jugadores[i+1][key_string][0]:
+            if flag == False and lista_jugadores[i][key_string] > lista_jugadores[i+1][key_string] or\
+                flag == True and lista_jugadores[i][key_string] < lista_jugadores[i+1][key_string]:
                 lista_jugadores[i], lista_jugadores[i+1] = lista_jugadores[i+1], lista_jugadores[i]
                 flag_swap = True
 
     return lista_jugadores
 
-#EJERCICIOS 7, 8, 9, 13, 14 Y 19
+#PARTE DE EJERCICIOS 7, 8, 9, 13, 14 Y 19
 def calcular_jugador_mayor_estadistica_dato(lista_jugadores: list, dato: str) -> list:
     '''
     Recibe como parametros una lista de diccionarios que contiene la informacion de cada uno de los jugadores
@@ -239,6 +240,7 @@ def calcular_jugador_mayor_estadistica_dato(lista_jugadores: list, dato: str) ->
     else: 
         print('LISTA VACIA')
 
+#PARTE DE EJERCICIOS 7, 8, 9, 13, 14 Y 19
 def mostrar_jugador_estadistica_dato(lista: list, dato: str) -> None:
     '''
     Recibe como parametros una lista de diccionarios que contiene la informacion de los jugadores y una variable string que representa una
@@ -314,7 +316,7 @@ def ordenar_estadistica_dato_descendente(lista_jugadores: list, dato) -> list:
             if lista_jugadores[i]['estadisticas'][dato] < lista_jugadores[i+1]['estadisticas'][dato]:
                 lista_jugadores[i], lista_jugadores[i+1] = lista_jugadores[i+1], lista_jugadores[i]
                 flag_swap = True
-
+    
     return lista_jugadores
 
 # EJERCICIO 17
@@ -336,6 +338,33 @@ def jugador_con_mas_logros(lista_jugadores: list) -> list:
     cadena = '\n----------{0}---------\n\nLOGROS:\n{1}'.format(lista_jugadores[indice_max]['nombre'], join_lista(lista_jugadores[indice_max]['logros'], True))
     return cadena
 
+#EJERCICIO 21(BONUS)
+def agregar_posicion_ranking_dato(lista_jugadores: list) -> str:
+    """
+    Esta función agrega una posición de clasificación a cada jugador en una lista basada en sus puntos
+    totales, rebotes, asistencias y robos, y devuelve una cadena formateada con el nombre del jugador y
+    su clasificación en cada categoría.
+    
+    :param lista_jugadores: Una lista de diccionarios que representan a los jugadores de baloncesto y
+     sus estadísticas. Ademas, a cada diccionario se le agrega claves cuyo nombre son los elementos, 
+     con un replace, de lista_datos.
+    :type lista_jugadores: list
+    :return: una cadena que contiene una lista separada por comas de las estadísticas de los jugadores.
+    """
+    
+    lista_datos = ['puntos_totales', 'rebotes_totales', 'asistencias_totales', 'robos_totales']
+    for dato in lista_datos:
+        lista_ordenada = ordenar_estadistica_dato_descendente(lista_jugadores, dato)
+
+        for i in range(len(lista_ordenada)):
+            lista_ordenada[i][dato.replace('_totales', "")] = i+1
+
+    lista_contenido = ['Jugador,Puntos,Rebotes,Asistencias,Robos']
+
+    for jugador in ordenar_palabras(lista_ordenada, 'nombre', False):
+        lista_contenido.append('{0},{1},{2},{3},{4}'.format(jugador['nombre'], jugador['puntos'], jugador['rebotes'], jugador['asistencias'], jugador['robos']))
+
+    return join_lista(lista_contenido, True)
 
 def imprimir_menu() -> None:
     '''
@@ -355,15 +384,16 @@ def imprimir_menu() -> None:
     print('10. Ingresar un valor y mostrar los jugadores que han promediado más puntos por partido que ese valor.')
     print('11. Ingresar un valor y mostrar los jugadores que han promediado más rebotes por partido que ese valor.')
     print('12. Ingresar un valor y mostrar los jugadores que han promediado más asistencias por partido que ese valor.')
-    print('13. Mostrar el jugador con la mayor cantidad de robos totales')
+    print('13. Mostrar el jugador con la mayor cantidad de robos totales.')
     print('14. Mostrar el jugador con la mayor cantidad de bloqueos totales.')
     print('15. Ingresar un valor y mostrar los jugadores que hayan tenido un porcentaje de tiros libres superior a ese valor.')
     print('16. Mostrar el promedio de puntos por partido del equipo excluyendo al jugador con la menor cantidad de puntos por partido.')
-    print('17. Mostrar el jugador con la mayor cantidad de logros obtenidos')
+    print('17. Mostrar el jugador con la mayor cantidad de logros obtenidos.')
     print('18. Ingresar un valor y mostrar los jugadores que hayan tenido un porcentaje de tiros triples superior a ese valor.')
-    print('19. Mostrar el jugador con la mayor cantidad de temporadas jugadas')
+    print('19. Mostrar el jugador con la mayor cantidad de temporadas jugadas.')
     print('20. Ingresar un valor y mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior a ese valor.')
-    print('0.  EXIT ')
+    print('21. Crear tabla de posiciones (por puntos, rebotes, asistencias y robos), ordenada por nombre en orden alfabetico.')
+    print('0.  Salir. ')
     print('--------------------------------------------------------------------------------------------------------------------------------------')
 
 def validar_numero(numero: str) -> int:
@@ -515,6 +545,9 @@ def main_dream_team(lista_jugadores: list) -> None:
             case 20:
                 numero_tiros_campo = validar_numero(input('Ingrese valor: '))
                 print(mayor_cantidad_dato(ordenar_palabras(lista_jugadores, 'posicion', False), 'porcentaje_tiros_de_campo', numero_tiros_campo))
+                input('PULSE ENTER PARA CONTINUAR')
+            case 21:
+                guardar_csv('Ranking_posiciones.csv', agregar_posicion_ranking_dato(lista_jugadores))
                 input('PULSE ENTER PARA CONTINUAR')
             case _:
                 print('Opcion no valida.')
