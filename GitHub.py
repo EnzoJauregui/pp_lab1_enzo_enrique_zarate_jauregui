@@ -24,21 +24,34 @@ def mostrar_jugadores_nombre_posicion(lista_jugadores: list) -> str:
         mensaje += '{0} - {1}\n'.format(jugador['nombre'], jugador['posicion'])
     return mensaje
 
+def join_lista(lista: list) -> str:
+    cadena = ','.join(lista)
+    return cadena
+
 #EJERCICIO 2
 def mostrar_estadisticas(lista_jugadores: list, indice_input: int) -> str:
     '''
-    Recibe coo parametros una lista de diccionarios que contiene la informacion de cada uno de los jugadores.
+    Recibe con parametros una lista de diccionarios que contiene la informacion de cada uno de los jugadores.
     Muestra el nombre, la posicion y las estadisticas del usuario ingresado por input.
     Retorna un string
     '''
     mensaje = ''
+    lista_valores = []
     for indice in range(len(lista_jugadores)):
         if indice_input == indice + 1:
             estadisticas = lista_jugadores[indice]['estadisticas']
-            nombre = '----------{0}---------\n\nPOSICION: {1}\n\nESTADISTICAS:\n'.format(lista_jugadores[indice]['nombre'], lista_jugadores[indice]['posicion'])
+            nombre = '----------{0}---------\n\n\n\nESTADISTICAS:\n'.format(lista_jugadores[indice]['nombre'])
+
             for clave, valor in estadisticas.items():
                 mensaje += '{1}: {2} \n'.format(nombre, clave.capitalize().replace('_', " "), valor)
-    return nombre + mensaje
+                lista_valores.append(str(valor))
+    
+    print(nombre + mensaje)
+
+    jugador = lista_jugadores[indice_input-1]
+
+    contenido = '{0}, {1}, {2}, {3}'.format(jugador['nombre'], jugador['posicion'], join_lista(lista_valores))
+    return contenido
 
 #EJERCICIO 3
 def guardar_csv(ruta: str,  contenido: str) -> bool:
@@ -188,12 +201,9 @@ def mostrar_jugador_estadistica_dato(lista: list, dato: str) -> None:
     return: None
     '''
     print('\nCoincidencias encontradas: {0}\n'.format(len(lista)))
+
     for jugador in lista:
             print('Nombre: {0} - {1}: {2}'.format(jugador['nombre'], dato.capitalize().replace('_', " "), jugador['estadisticas'][dato]))
-        
-
-        
-    
 
 #EJERCICION 10, 11, 12, 15, 18 Y PARTE DEL 20
 def mayor_cantidad_dato(lista_jugadores: list, dato: str, numero: int) -> str:
@@ -352,7 +362,6 @@ def validar_nombre(lista_jugadores: list) -> list:
     entrada proporcionada por el usuario. Si no se encuentran coincidencias, la función devuelve una
     lista vacía.
     """
-  
     nombres_coincidentes = []
     contador_coincidencias = 0
 
@@ -375,7 +384,6 @@ def validar_nombre(lista_jugadores: list) -> list:
         print("Entrada inválida. Ingresar solo letras.")
         input('PULSE ENTER PARA CONTINUAR')
 
-
 def main_dream_team(lista_jugadores: list) -> None:
     '''
     Recibe como parametro la lista de diccionarios con informacion de cada jugador del DreamTeam
@@ -397,7 +405,6 @@ def main_dream_team(lista_jugadores: list) -> None:
             case 2:
                 indice_input = validar_indice()
                 opcion_dos = mostrar_estadisticas(lista_jugadores, indice_input)
-                print(opcion_dos)
                 flag_guardar = True
                 input('PULSE ENTER PARA CONTINUAR')
             case 3:
@@ -455,7 +462,7 @@ def main_dream_team(lista_jugadores: list) -> None:
                 input('PULSE ENTER PARA CONTINUAR')
             case 16:
                 dato = 'promedio_puntos_por_partido'
-                promedio = calcular_promedio_puntos_por_partido( ordenar_estadistica_dato_descendente(lista_jugadores, dato)[:-1], dato)
+                promedio = calcular_promedio_puntos_por_partido(ordenar_estadistica_dato_descendente(lista_jugadores, dato)[:-1], dato)
                 print('El {0} del equipo excluyendo al jugador que menos puntos tiene: {1}'.format(dato.replace('_', " "), promedio))
                 input('PULSE ENTER PARA CONTINUAR')
             case 17:
