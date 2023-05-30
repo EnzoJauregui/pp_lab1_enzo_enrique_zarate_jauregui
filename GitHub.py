@@ -366,6 +366,79 @@ def agregar_posicion_ranking_dato(lista_jugadores: list) -> str:
 
     return join_lista(lista_contenido, True)
 
+#EJERCICIO 22
+def cantidad_jugadores_por_posicion(lista_jugadores: list) -> str:
+    '''
+    Determinar la cantidad de jugadores que hay por cada posición.
+    Ejemplo:
+    Base: 2
+    Alero: 3
+    '''
+    diccionario_posicion = {}
+    for jugador in lista_jugadores:
+        if jugador['posicion'] in diccionario_posicion:
+            diccionario_posicion[jugador['posicion']] += 1
+        else:
+            diccionario_posicion[jugador['posicion']] = 1
+    lista_cantidad_posicion = []
+
+    for clave, valor in diccionario_posicion.items():
+        lista_cantidad_posicion.append('{0}: {1}'.format(clave, valor))
+
+    return join_lista(lista_cantidad_posicion, True)
+
+#EJERCICIO 23
+def cantidad_all_star(lista_jugadores: list) -> str:
+    '''
+    Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente. La salida por pantalla debe tener un formato similar a este:
+Michael Jordan (14 veces All Star)
+Magic Johnson (12 veces All-Star)
+    '''
+    for jugador in lista_jugadores:
+        for elemento in jugador['logros']:
+            if re.search(r'All-Star', elemento):
+                jugador['All-Star'] = (re.match(r'(\d+)', elemento))
+                print(re.match('\d+', elemento))
+    for jugador in lista_jugadores:
+        print(jugador)
+            
+cantidad_all_star(lista_jugadores)
+
+#EJERCICIO 24
+def imprimir_mayores_estadisticas(lista_jugadores: list) -> str:
+    '''
+    Determinar qué jugador tiene las mejores estadísticas en cada valor. La salida por pantalla debe tener un formato similar a este:
+Mayor cantidad de temporadas: Karl Malone (19)
+Mayor cantidad de puntos totales: Karl Malon (36928)
+
+    '''
+    lista = []
+    lista_datos = ["temporadas", "puntos_totales", "rebotes_totales", "promedio_rebotes_por_partido", "asistencias_totales", "promedio_asistencias_por_partido"
+                   "robos_totales", "bloqueos_totales", "porcentaje_tiros_de_campo", "porcentaje_tiros_libres", "porcentaje_tiros_triples"]
+    for dato in lista_datos:
+       for jugador in calcular_jugador_mayor_estadistica_dato(lista_jugadores, dato):
+        lista.append('Mayor cantidad de {0}: {1} ({2})'.format(normalizar_dato(dato), jugador['nombre'], jugador['estadisticas'][dato]))
+
+    return join_lista(lista, True)  
+
+#EJERCICIO 25
+def jugador_con_mayor_estadistica(lista_jugadores: list) -> str:
+    '''
+    
+    '''
+    acumulador_estadistica = 0
+
+    for indice in range(len(lista_jugadores)):
+        for valor in lista_jugadores[indice]['estadisticas'].values():
+            acumulador_estadistica += valor
+
+        if indice == 0 or acumulador_estadistica > max_estadistica:
+            max_estadistica = acumulador_estadistica
+            indice_max = indice
+        
+    cadena = 'El jugador con la mayor estadistica es: {0}'.format(lista_jugadores[indice_max]['nombre'])
+    return cadena
+
 def imprimir_menu() -> None:
     '''
     Muestra el menu de opciones
@@ -393,6 +466,9 @@ def imprimir_menu() -> None:
     print('19. Mostrar el jugador con la mayor cantidad de temporadas jugadas.')
     print('20. Ingresar un valor y mostrar los jugadores , ordenados por posición en la cancha, que hayan tenido un porcentaje de tiros de campo superior a ese valor.')
     print('21. Crear tabla de posiciones (por puntos, rebotes, asistencias y robos), ordenada por nombre en orden alfabetico.')
+    print('22. Mostrar la cantidad de jugadores que hay por cada posición.')
+    print('24. Mostrar qué jugador tiene las mejores estadísticas en cada valor.')
+    print('25. Mostrar qué jugador tiene las mejores estadísticas de todos.')
     print('0.  Salir. ')
     print('--------------------------------------------------------------------------------------------------------------------------------------')
 
@@ -548,6 +624,18 @@ def main_dream_team(lista_jugadores: list) -> None:
                 input('PULSE ENTER PARA CONTINUAR')
             case 21:
                 guardar_csv('Ranking_posiciones.csv', agregar_posicion_ranking_dato(lista_jugadores))
+                input('PULSE ENTER PARA CONTINUAR')
+            case 22:
+                print(cantidad_jugadores_por_posicion(lista_jugadores))
+                input('PULSE ENTER PARA CONTINUAR')
+            case 23:
+
+                input('PULSE ENTER PARA CONTINUAR')
+            case 24:
+                print(imprimir_mayores_estadisticas(lista_jugadores))
+                input('PULSE ENTER PARA CONTINUAR')
+            case 25:
+                print(jugador_con_mayor_estadistica(lista_jugadores))
                 input('PULSE ENTER PARA CONTINUAR')
             case _:
                 print('Opcion no valida.')
