@@ -32,7 +32,6 @@ def join_lista(lista: list, flag_join: bool) -> str:
         return -1
     return cadena
 
-lista_jugadores = leer_archivo('C:\\Users\\enzo9\\OneDrive\\Documentos\\Programacion 1\\def\\dt.json')
 #EJERCICIO 1 Y PARTE DEL EJERCICIO 5
 def mostrar_jugadores_nombre_posicion(lista_jugadores: list, flag_jugador: bool) -> str:
     '''
