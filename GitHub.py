@@ -32,6 +32,7 @@ def join_lista(lista: list, flag_join: bool) -> str:
         return -1
     return cadena
 
+lista_jugadores = leer_archivo('C:\\Users\\enzo9\\OneDrive\\Documentos\\Programacion 1\\def\\dt.json')
 #EJERCICIO 1 Y PARTE DEL EJERCICIO 5
 def mostrar_jugadores_nombre_posicion(lista_jugadores: list, flag_jugador: bool) -> str:
     '''
@@ -369,10 +370,10 @@ def agregar_posicion_ranking_dato(lista_jugadores: list) -> str:
 #EJERCICIO 22
 def cantidad_jugadores_por_posicion(lista_jugadores: list) -> str:
     '''
-    Determinar la cantidad de jugadores que hay por cada posición.
-    Ejemplo:
-    Base: 2
-    Alero: 3
+    Recibe una lista de jugadores como parametro que contiene la informacion un jugador por cada diccionario.
+    Crea un diccionario donde iran la cantidad de jugadores que hay en cada posicion
+    Devuelve un string con el nombre de la posicion y la cantidad de jugadores de la lista que tiene cada una
+    retorna un string
     '''
     diccionario_posicion = {}
     for jugador in lista_jugadores:
@@ -380,6 +381,7 @@ def cantidad_jugadores_por_posicion(lista_jugadores: list) -> str:
             diccionario_posicion[jugador['posicion']] += 1
         else:
             diccionario_posicion[jugador['posicion']] = 1
+
     lista_cantidad_posicion = []
 
     for clave, valor in diccionario_posicion.items():
@@ -388,29 +390,43 @@ def cantidad_jugadores_por_posicion(lista_jugadores: list) -> str:
     return join_lista(lista_cantidad_posicion, True)
 
 #EJERCICIO 23
-def cantidad_all_star(lista_jugadores: list) -> str:
-    '''
-    Mostrar la lista de jugadores ordenadas por la cantidad de All-Star de forma descendente. La salida por pantalla debe tener un formato similar a este:
-Michael Jordan (14 veces All Star)
-Magic Johnson (12 veces All-Star)
-    '''
+def cantidad_all_star(lista_jugadores: list) -> list:
+    """
+    Recibe una lista de jugadores como parametro que contiene la informacion un jugador por cada diccionario.
+    Esta función toma una lista de jugadores y sus logros, los ordena por el número de logros All-Star
+    que tienen devuelve una cadena formateada de los nombres de los jugadores y sus logros All-Star.
+    Retorna un string
+    """
+    
     for jugador in lista_jugadores:
         for elemento in jugador['logros']:
             if re.search(r'All-Star', elemento):
-                jugador['All-Star'] = (re.match(r'(\d+)', elemento))
-                print(re.match('\d+', elemento))
+                jugador['Star'] = re.search(r'(\d+)', elemento).group()
+
+    rango = len(lista_jugadores[:-1])
+    flag_swap = True
+    while flag_swap:
+        flag_swap = False
+        rango -= 1
+        for i in range(rango):
+            if int(lista_jugadores[i]['Star']) < int(lista_jugadores[i+1]['Star']):
+                lista_jugadores[i], lista_jugadores[i+1] = lista_jugadores[i+1], lista_jugadores[i]
+                flag_swap = True
+
+    lista = []
     for jugador in lista_jugadores:
-        print(jugador)
-            
-cantidad_all_star(lista_jugadores)
+        for elemento in jugador['logros']:
+            if re.search(r'All-Star', elemento):
+                lista.append('{0} ({1})'.format(jugador['nombre'], elemento))
+    return join_lista(lista, True)                          
 
 #EJERCICIO 24
 def imprimir_mayores_estadisticas(lista_jugadores: list) -> str:
     '''
-    Determinar qué jugador tiene las mejores estadísticas en cada valor. La salida por pantalla debe tener un formato similar a este:
-Mayor cantidad de temporadas: Karl Malone (19)
-Mayor cantidad de puntos totales: Karl Malon (36928)
-
+    Recibe una lista de jugadores como parametro que contiene la informacion un jugador por cada diccionario.
+    Determina el jugador tiene las mejores estadísticas en cada valor.
+    Devuelve un string con el los nombres de los que tienen el mayor numero de cada estadistca con su respectivo valor
+    retonna un string
     '''
     lista = []
     lista_datos = ["temporadas", "puntos_totales", "rebotes_totales", "promedio_rebotes_por_partido", "asistencias_totales", "promedio_asistencias_por_partido"
@@ -424,7 +440,9 @@ Mayor cantidad de puntos totales: Karl Malon (36928)
 #EJERCICIO 25
 def jugador_con_mayor_estadistica(lista_jugadores: list) -> str:
     '''
-    
+    Recibe una lista de jugadores como parametro que contiene la informacion un jugador por cada diccionario.
+    Acumula todos los valores de las estadisticas y devuelve cual es el jugador que mas valor acumulo
+    retoran un string
     '''
     acumulador_estadistica = 0
 
@@ -629,7 +647,7 @@ def main_dream_team(lista_jugadores: list) -> None:
                 print(cantidad_jugadores_por_posicion(lista_jugadores))
                 input('PULSE ENTER PARA CONTINUAR')
             case 23:
-
+                print(cantidad_all_star(lista_jugadores))   
                 input('PULSE ENTER PARA CONTINUAR')
             case 24:
                 print(imprimir_mayores_estadisticas(lista_jugadores))
