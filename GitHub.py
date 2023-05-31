@@ -389,7 +389,7 @@ def cantidad_jugadores_por_posicion(lista_jugadores: list) -> str:
     return join_lista(lista_cantidad_posicion, True)
 
 #EJERCICIO 23
-def cantidad_all_star(lista_jugadores: list) -> list:
+def ordenar_por_all_star(lista_jugadores: list) -> str:
     """
     Recibe una lista de jugadores como parametro que contiene la informacion un jugador por cada diccionario.
     Esta función toma una lista de jugadores y sus logros, los ordena por el número de logros All-Star
@@ -400,24 +400,16 @@ def cantidad_all_star(lista_jugadores: list) -> list:
     for jugador in lista_jugadores:
         for elemento in jugador['logros']:
             if re.search(r'All-Star', elemento):
-                jugador['Star'] = re.search(r'(\d+)', elemento).group()
+                jugador['Star'] = int(re.search(r'(\d+)', elemento).group())
 
-    rango = len(lista_jugadores[:-1])
-    flag_swap = True
-    while flag_swap:
-        flag_swap = False
-        rango -= 1
-        for i in range(rango):
-            if int(lista_jugadores[i]['Star']) < int(lista_jugadores[i+1]['Star']):
-                lista_jugadores[i], lista_jugadores[i+1] = lista_jugadores[i+1], lista_jugadores[i]
-                flag_swap = True
-
+    lista_ordenada = ordenar_palabras(lista_jugadores[:-1], 'Star', True)
+    
     lista = []
-    for jugador in lista_jugadores:
+    for jugador in lista_ordenada:
         for elemento in jugador['logros']:
             if re.search(r'All-Star', elemento):
                 lista.append('{0} ({1})'.format(jugador['nombre'], elemento))
-    return join_lista(lista, True)                          
+    return join_lista(lista, True)  
 
 #EJERCICIO 24
 def imprimir_mayores_estadisticas(lista_jugadores: list) -> str:
@@ -646,7 +638,7 @@ def main_dream_team(lista_jugadores: list) -> None:
                 print(cantidad_jugadores_por_posicion(lista_jugadores))
                 input('PULSE ENTER PARA CONTINUAR')
             case 23:
-                print(cantidad_all_star(lista_jugadores))   
+                print(ordenar_por_all_star(lista_jugadores))   
                 input('PULSE ENTER PARA CONTINUAR')
             case 24:
                 print(imprimir_mayores_estadisticas(lista_jugadores))
